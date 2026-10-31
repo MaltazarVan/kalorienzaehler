@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KalorienZähler</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#16a34a">
+  <style>
+    :root { --green: #16a34a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f8fafc; color: #1e293b; max-width: 640px; margin: 0 auto; padding-bottom: 40px; }
+    header { position: sticky; top: 0; background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 16px; z-index: 10; }
+    h1 { font-size: 1.1rem; color: var(--green); }
+    nav { display: flex; gap: 8px; margin-top: 8px; }
+    nav button { flex: 1; padding: 8px; border: none; background: #e2e8f0; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    nav button.active { background: var(--green); color: white; }
+    main { padding: 16px; }
+    section.hidden { display: none; }
+    .card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
+    .card h2 { font-size: 0.95rem; margin-bottom: 10px; }
+    label { display: block; font-size: 0.78rem; color: #64748b; margin: 8px 0 3px; }
+    input, select { width: 100%; padding: 9px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
+    button.add { margin-top: 12px; width: 100%; padding: 11px; background: var(--green); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    .goal-bar { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; margin-top: 8px; }
+    .goal-fill { height: 100%; background: var(--green); transition: width .3s; width: 0; }
+    #goal-bar.over .goal-fill { background: #dc2626; }
+    ul.list { list-style: none; }
+    li.row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; gap: 8px; }
+    .name { font-size: 0.92rem; }
+    .meta { font-size: 0.75rem; color: #64748b; }
+    .kcal { font-weight: 700; white-space: nowrap; }
+    button.del { background: none; border: none; color: #dc2626; font-size: 1.1rem; cursor: pointer; padding: 4px 8px; }
+    .day-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 600; }
+    .day-nav button { border: none; background: #e2e8f0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+    .sums { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 10px; color: #475569; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>KalorienZähler</h1>
+  <nav>
+    <button id="tab-today" class="active">Heute</button>
+    <button id="tab-foods">Lebensmittel</button>
+  </nav>
+</header>
+
+<main>
+  <!-- Tab: Tagesverlauf -->
+  <section id="view-today">
+    <div class="day-nav">
+      <button id="prev-day" aria-label="Voriger Tag">←</button>
+      <span id="day-label"></span>
+      <button id="next-day" aria-label="Nächster Tag">→</button>
+    </div>
+
+    <div class="card">
+      <h2>Tagesziel</h2>
+      <label for="goal-input">Ziel (kcal / Tag)</label>
+      <input id="goal-input" type="number" min="0" step="50" placeholder="z. B. 2000">
+      <div class="sums"><span id="total-label"></span><span id="remaining-label"></span></div>
+      <div id="goal-bar" class="goal-bar"><div class="goal-fill" id="goal-fill"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>Eintrag hinzufügen</h2>
+      <label for="food-select">Lebensmittel</label>
+      <select id="food-select"></select>
+      <label for="amount-input">Menge (g)</label>
+      <input id="amount-input" type="number" min="1" inputmode="numeric" placeholder="z. B. 200">
+      <button class="add" id="log-add">Loggen</button>
+    </div>
+
+    <div class="card">
+      <h2>Einträge</h2>
+      <ul class="list" id="entry-list"></ul>
+    </div>
+  </section>
+
+  <!-- Tab: Lebensmittel -->
+  <section id="view-foods" class="hidden">
+    <div class="card">
+      <h2>Neues Lebensmittel</h2>
+      <label for="food-name">Name</label>
+      <input id="food-name" placeholder="z. B. Haferflocken">
+      <label for="food-kcal">kcal pro 100 g</label>
+      <input id="food-kcal" type="number" min="0" inputmode="decimal" placeholder="z. B. 370">
+      <button class="add" id="food-add">Speichern</button>
+    </div>
+
+    <div class="card">
+      <h2>Gespeicherte Lebensmittel</h2>
+      <ul class="list" id="food-list"></ul>
+    </div>
+  </section>
+</main>
+
+<script src="db.js"></script>
+<script src="app.js"></script>
+<script>
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
